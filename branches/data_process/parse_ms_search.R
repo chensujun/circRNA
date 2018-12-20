@@ -22,6 +22,11 @@ save(mysearch, file = paste0(Sys.Date(), '_peptide_search.rda'));
 mycirc <- gsub('pre=.*,post=.*|\\(|\\)', '', mysearch$Protein);
 mycirc <- unlist(strsplit(mycirc, ';'));
 mycirc <- unique(gsub('_[0-9]+$', '', mycirc));
+##
+circ.pp <- gsub('pre=.*,post=.*|\\(|\\)', '', mysearch$ProteinName);
+circ.pp <- gsub('_[0-9]+$', '', circ.pp);
+circ.pp <- data.frame(table(circ.pp));
+
 ### characteristics of circRNAs with peptide detection
 #### length distribution
 ref <- read.csv(conf$ref_m6a, as.is = TRUE, row.names = 1);
@@ -189,14 +194,33 @@ polygon(npeak.non, col = col_f[1], border = col_b[1]);
 polygon(npeak.pp, col = col_f[2], border = col_b[2]);
 legend(2.3, 1.2, border = col_b, fill = col_f, bty = 'n', legend = c('No', 'Yes'));
 dev.off();
-
-pdf(generate.filename('density_length', 'circRNA_peptide', 'pdf'));
-par(xaxs='i',yaxs='i', ps = 15, font.axis = 1, font.lab= 1)
-plot(len.all, main = '', xlim = c(0, 6), ylim = c(0, 1), col = col_b[1], 
-        xlab = expression('Length'), axes = FALSE);
-axis(1, pos=0, at = seq(0, 6), labels = format(10^seq(0, 6), scientific=FALSE));
-axis(2, pos=0, las = 2);
-polygon(len.all, col = col_f[1], border = col_b[1]);
-polygon(len.pp, col = col_f[2], border = col_b[2]);
-legend(3.8, 0.95, border = col_b, fill = col_f, bty = 'n', legend = c('All', 'Peptide detection'));
-dev.off();
+to.plot <- data.frame(table(to.plot$npeak, to.plot$pp_circ));
+create.barplot(
+	formula = Freq~Var1,
+	data = to.plot,
+	groups = Var2,
+	col = default.colours(2),
+	border.col = default.colours(2),
+	ylab.label = '# circRNAs',
+	xlab.label = '# m6A peaks',
+	xaxis.lab = c(1, '>=2'),
+	yat = seq(0, 2000, 500),
+	ylim = c(0, 2300),
+	filename = generate.filename('npeak', 'circRNA_peptide', 'pdf'),
+	style = 'Nature',
+	key = list(
+        points = list(
+        	col = default.colours(2),
+        	pch = 22,
+        	cex = 1.5,
+        	fill = default.colours(2)
+        	),
+        text = list(
+        	lab = c('No', 'Yes')
+        	),
+    x = 0.75,
+    y = 0.99
+	),
+	width = 4
+	);
+####

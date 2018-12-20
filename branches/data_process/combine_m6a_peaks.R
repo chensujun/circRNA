@@ -81,5 +81,5 @@ cmd1 <- paste0('cut -f 1,2,3,4,5,6 ', paste0(Sys.Date(), '_peaks_merge.bed'), '>
 system2('/bin/bash', args = c('-c', shQuote(cmd1)));
 #### read in the new file
 mdat <- read.table(paste0(Sys.Date(), '_peaks_merge.bed'), as.is = TRUE);
-colnames(mdat) <- fname;
+colnames(mdat)[7:ncol(mdat)] <- fname;
 save(mdat, file = paste0(Sys.Date(), '_peaks_merge.rda'));
